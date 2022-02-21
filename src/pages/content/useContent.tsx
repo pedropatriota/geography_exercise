@@ -25,6 +25,9 @@ interface ElementsJsonProps {
 }
 
 export const useContent = () => {
+  /*
+   * States
+   */
   const [responses, setResponses] = useState({
     RESPONSE0: "",
     RESPONSE1: "",
@@ -45,13 +48,17 @@ export const useContent = () => {
     ["default", "default", "default"],
   ]);
 
-  const [dataToShuffle, setDataToShuffle] = useState<
-    ChoicesJsonProps[] | undefined
-  >([]);
+  const [shuffle, setShuffle] = useState<boolean>(false);
 
   const [openModal, setOpenModal] = useState<boolean>(false);
 
   const [totalCorrections, setTotalCorrections] = useState<number | string>(0);
+
+  const alphabetic = ["a", "b", "c"];
+
+  /*
+   * Effects
+   */
 
   useEffect(() => {
     if (Object.values(responses).some(res => res !== "")) {
@@ -94,9 +101,11 @@ export const useContent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [responses]);
 
-  const alphabetic = ["a", "b", "c"];
+  /*
+   * Functions
+   */
 
-  const disableRadioButton = () => setDisableInput(true);
+  const disableRadioButton = useCallback(() => setDisableInput(true), []);
 
   const shuffleArray = (array: ChoicesJsonProps[]) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -135,11 +144,13 @@ export const useContent = () => {
     setOpenModal(prev => !prev);
     disableRadioButton();
     setValidationMode(true);
+    setShuffle(false);
   };
 
   const handleTryAgain = useCallback(() => {
     setDisableInput(false);
     setValidationMode(false);
+    setShuffle(true);
     setStatus([
       ["default", "default", "default"],
       ["default", "default", "default"],
@@ -161,7 +172,7 @@ export const useContent = () => {
               responseIdentifier={responseIdentifier}
             />
 
-            {choices?.map((choice, id) => (
+            {(shuffle ? shuffleArray(choices) : choices)?.map((choice, id) => (
               <Option
                 key={choice.identifier}
                 identifier={choice.identifier}
@@ -179,7 +190,6 @@ export const useContent = () => {
     );
 
   return {
-    shuffleArray,
     renderQuestions,
     openModal,
     close,
