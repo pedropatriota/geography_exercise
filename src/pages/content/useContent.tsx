@@ -61,6 +61,15 @@ export const useContent = () => {
    */
 
   useEffect(() => {
+    if (shuffle) {
+      (async function waitToUnShuffle() {
+        setTimeout(() => setShuffle(false), 500);
+        await sleep(500);
+      })();
+    }
+  }, [shuffle]);
+
+  useEffect(() => {
     if (Object.values(responses).some(res => res !== "")) {
       setDisabled(false);
     } else setDisabled(true);
@@ -105,6 +114,10 @@ export const useContent = () => {
    * Functions
    */
 
+  function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   const disableRadioButton = useCallback(() => setDisableInput(true), []);
 
   const shuffleArray = (array: ChoicesJsonProps[]) => {
@@ -144,13 +157,17 @@ export const useContent = () => {
     setOpenModal(prev => !prev);
     disableRadioButton();
     setValidationMode(true);
-    setShuffle(false);
   };
 
   const handleTryAgain = useCallback(() => {
     setDisableInput(false);
     setValidationMode(false);
     setShuffle(true);
+    setResponses({
+      RESPONSE0: "",
+      RESPONSE1: "",
+      RESPONSE2: "",
+    });
     setStatus([
       ["default", "default", "default"],
       ["default", "default", "default"],
@@ -172,22 +189,29 @@ export const useContent = () => {
               responseIdentifier={responseIdentifier}
             />
 
-            {(shuffle ? shuffleArray(choices) : choices)?.map((choice, id) => (
-              <Option
-                key={choice.identifier}
-                identifier={choice.identifier}
-                responseIdentifier={responseIdentifier}
-                order={alphabetic[id]}
-                status={status[index][id]}
-                handleInputChange={handleInputChange}
-                option={choice["#text"] || choice["text"]}
-                disabled={disableInput}
-              />
-            ))}
+            {
+              /*shuffle ? shuffleArray(choices) :*/ choices?.map(
+                (choice, id) => (
+                  <Option
+                    key={choice.identifier}
+                    identifier={choice.identifier}
+                    responseIdentifier={responseIdentifier}
+                    order={alphabetic[id]}
+                    checked={false}
+                    status={status[index][id]}
+                    handleInputChange={handleInputChange}
+                    option={choice["#text"] || choice["text"]}
+                    disabled={disableInput}
+                  />
+                )
+              )
+            }
           </Container>
         );
       }
     );
+
+  console.log({ responses });
 
   return {
     renderQuestions,

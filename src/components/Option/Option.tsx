@@ -11,7 +11,8 @@ export interface OptionProps {
   responseIdentifier?: string;
   handleInputChange?: (name: string, value: string, index?: number) => void;
   handleClick?: () => void;
-  disabled?: boolean;
+  disabled: boolean;
+  checked?: boolean;
 }
 
 const statusProps = {
@@ -25,6 +26,7 @@ export const Option = ({
   order,
   option,
   status,
+  checked,
   identifier,
   responseIdentifier,
   handleInputChange,
@@ -40,6 +42,7 @@ export const Option = ({
       <input
         type="radio"
         value={identifier}
+        checked={checked}
         style={{ display: "none" }}
         name={responseIdentifier}
         disabled={disabled}
